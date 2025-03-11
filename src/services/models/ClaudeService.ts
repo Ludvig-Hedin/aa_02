@@ -1,139 +1,169 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { ModelService, ModelRequestOptions, ModelResponse, ModelMessage } from './ModelService';
+import { Anthropic } from '@anthropic-ai/sdk';
+import { ModelMessage, ModelRequestOptions, ModelResponse, ModelService, formatModelResponse, registerModelService } from './ModelService';
 
-interface ClaudeServiceOptions {
+/**
+ * Options for configuring the Claude service
+ */
+export interface ClaudeServiceOptions {
+  /**
+   * Model ID to use
+   */
+  modelId: 'claude-3-opus' | 'claude-3-sonnet' | 'claude-3-haiku';
+  
+  /**
+   * API key for Anthropic
+   */
   apiKey?: string;
-  modelVersion: 'claude-3-opus' | 'claude-3-sonnet' | 'claude-3-haiku';
 }
 
 /**
- * Implementation of ModelService for Anthropic's Claude models
- * 
- * Supports Claude 3 Opus, Sonnet, and Haiku models
+ * Service implementation for the Anthropic Claude models
  */
 export class ClaudeService implements ModelService {
-  private client: Anthropic | null = null;
-  private apiKey: string | undefined;
-  private initialized: boolean = false;
-  
   id: string;
   name: string;
-  provider: string = 'Anthropic';
-  isAvailable: boolean = false;
-  
+  provider = 'Anthropic';
+  isAvailable: boolean;
+  client: Anthropic | null = null;
+  apiKey?: string;
+  maxTokens?: number = 4096;
+  modelType: 'chat' | 'completion' | 'embedding' = 'chat';
+  status: 'ready' | 'loading' | 'error' = 'loading';
+  temperature?: number = 0.7;
+  description?: string;
+
+  /**
+   * Create a new Claude service
+   */
   constructor(options: ClaudeServiceOptions) {
-    this.apiKey = options.apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
-    this.id = options.modelVersion;
+    this.id = options.modelId;
     
-    // Set the display name based on the model version
-    switch (options.modelVersion) {
+    // Set the model name based on the model ID
+    switch (options.modelId) {
       case 'claude-3-opus':
         this.name = 'Claude 3 Opus';
+        this.description = 'Anthropic\'s most powerful model, with a 200K context window';
         break;
       case 'claude-3-sonnet':
         this.name = 'Claude 3 Sonnet';
+        this.description = 'A balanced model for enterprise tasks, with a 200K context window';
         break;
       case 'claude-3-haiku':
         this.name = 'Claude 3 Haiku';
+        this.description = 'Fast and cost-effective model for simpler tasks, with a 200K context window';
         break;
     }
+    
+    this.apiKey = options.apiKey;
+    this.isAvailable = false;
   }
   
   /**
    * Initialize the Claude service
-   * Create the Anthropic client and verify the API key
    */
   async initialize(): Promise<void> {
-    if (!this.apiKey) {
-      throw new Error('Anthropic API key is required for Claude service');
-    }
-    
     try {
-      this.client = new Anthropic({
-        apiKey: this.apiKey,
-      });
+      // Get API key from environment if not provided
+      const apiKey = this.apiKey || process.env.ANTHROPIC_API_KEY;
       
-      // Check if the API key is valid
-      await this.client.messages.create({
-        model: this.id,
-        max_tokens: 1,
-        messages: [{ role: 'user', content: 'Hello' }],
-      });
+      if (!apiKey) {
+        console.warn(`No API key provided for Claude service ${this.id}`);
+        this.isAvailable = false;
+        this.status = 'error';
+        return;
+      }
       
+      // Create Anthropic client
+      this.client = new Anthropic({ apiKey });
       this.isAvailable = true;
-      this.initialized = true;
+      this.status = 'ready';
     } catch (error) {
-      console.error('Failed to initialize Claude service:', error);
+      console.error(`Failed to initialize Claude service ${this.id}:`, error);
       this.isAvailable = false;
-      throw new Error('Failed to initialize Claude service. Check your API key.');
+      this.status = 'error';
     }
   }
   
   /**
    * Send a message to Claude and get a response
    */
-  async sendMessage(message: string, options: ModelRequestOptions = {}): Promise<ModelResponse> {
-    if (!this.initialized) {
+  async sendMessage(messages: ModelMessage[], options?: ModelRequestOptions): Promise<ModelResponse> {
+    if (!this.client) {
       await this.initialize();
+      
+      if (!this.client) {
+        throw new Error(`Claude service ${this.id} is not available`);
+      }
     }
-    
-    if (!this.client || !this.isAvailable) {
-      throw new Error('Claude service is not available. Check your API key and internet connection.');
-    }
-    
-    // Prepare the history messages in Anthropic's format
-    const messages: {role: 'user' | 'assistant' | 'system'; content: string}[] = [];
-    
-    // Add system message if provided
-    if (options.systemPrompt) {
-      messages.push({
-        role: 'system',
-        content: options.systemPrompt,
-      });
-    }
-    
-    // Add conversation history if provided
-    if (options.history && options.history.length > 0) {
-      options.history.forEach(historyMessage => {
-        messages.push({
-          role: historyMessage.role,
-          content: historyMessage.content,
-        });
-      });
-    }
-    
-    // Add the current message
-    messages.push({
-      role: 'user',
-      content: message,
-    });
     
     try {
+      // Convert messages to Claude format
+      const formattedMessages = messages.map(message => ({
+        role: message.role === 'system' ? 'user' : message.role, // Convert system to user for compatibility
+        content: message.content
+      }));
+      
+      // Extract system message if present
+      let systemPrompt = options?.systemPrompt || '';
+      const systemMessages = messages.filter(msg => msg.role === 'system');
+      
+      if (systemMessages.length > 0 && !systemPrompt) {
+        systemPrompt = systemMessages[0].content;
+      }
+      
+      // Only include user and assistant messages in the messages array
+      const filteredMessages = formattedMessages.filter(
+        msg => msg.role === 'user' || msg.role === 'assistant'
+      );
+      
+      // Call Claude API
       const response = await this.client.messages.create({
         model: this.id,
-        max_tokens: options.maxTokens || 4000,
-        temperature: options.temperature || 0.7,
-        messages,
+        max_tokens: options?.maxTokens || this.maxTokens || 4096, // Ensure a non-undefined value
+        temperature: options?.temperature !== undefined ? options.temperature : (this.temperature || 0.7),
+        system: systemPrompt,
+        messages: filteredMessages as any, // Type assertion to bypass strict type checking
       });
       
-      return {
-        content: response.content[0].text,
-        metadata: {
-          usage: response.usage,
-          model: response.model,
-          id: response.id,
-        },
-      };
+      // Format the response
+      return formatModelResponse(response, this.id);
     } catch (error) {
-      console.error('Error sending message to Claude:', error);
-      throw new Error('Failed to get response from Claude');
+      console.error(`Error sending message to Claude service ${this.id}:`, error);
+      throw error;
     }
   }
 }
 
 /**
- * Create a Claude service for a specific model version
+ * Create a new Claude service
  */
-export const createClaudeService = (modelVersion: 'claude-3-opus' | 'claude-3-sonnet' | 'claude-3-haiku'): ModelService => {
-  return new ClaudeService({ modelVersion });
-}; 
+export function createClaudeService(
+  modelId: 'claude-3-opus' | 'claude-3-sonnet' | 'claude-3-haiku',
+  apiKey?: string
+): ClaudeService {
+  const service = new ClaudeService({
+    modelId,
+    apiKey,
+  });
+  
+  // Initialize the service
+  service.initialize().catch(err => {
+    console.error(`Failed to initialize ${modelId}:`, err);
+  });
+  
+  // Register the service
+  registerModelService(service);
+  
+  return service;
+}
+
+// Initialize Claude services during module load
+const claudeModels = [
+  'claude-3-opus',
+  'claude-3-sonnet',
+  'claude-3-haiku'
+] as const;
+
+claudeModels.forEach(modelId => {
+  createClaudeService(modelId);
+}); 

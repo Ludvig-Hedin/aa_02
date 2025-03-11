@@ -18,12 +18,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Authentication page with email and OAuth providers
 - Model service interfaces for AI integration
 - Claude service implementation
+- OpenAI service implementation for GPT models
+- Local model service for managing offline AI models
+- Models page with download management UI
+- Utility functions for formatting data (bytes, dates, durations)
+- Model grouping by provider in the UI
 
 ### Changed
-- N/A
+- Updated navigation sidebar to include Models page with appropriate icons
+- Modified DashboardLayout component to use correct navigation structure
+- Implemented monochromatic color scheme in Tailwind configuration
 
 ### Fixed
-- N/A
+- Corrected import paths for utility functions
+- Fixed model selection in chat interface
+- Resolved navigation highlighting for current page
 
 ## [0.1.0] - 2025-03-11
 
