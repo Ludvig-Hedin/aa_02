@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
@@ -28,6 +28,13 @@ const Layout = ({
   const session = useSession()
   const supabase = useSupabaseClient()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  
+  // After component mounts, we can safely show the theme toggle
+  // to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -72,7 +79,7 @@ const Layout = ({
                 className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
                 aria-label="Toggle theme"
               >
-                {theme === 'dark' ? '🌞' : '🌙'}
+                {mounted ? (theme === 'dark' ? '🌞' : '🌙') : <span>🔆</span>}
               </button>
               
               {session ? (
@@ -118,7 +125,7 @@ const Layout = ({
                   className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
                   aria-label="Toggle theme"
                 >
-                  {theme === 'dark' ? '🌞' : '🌙'}
+                  {mounted ? (theme === 'dark' ? '🌞' : '🌙') : <span>🔆</span>}
                 </button>
                 
                 {session ? (
