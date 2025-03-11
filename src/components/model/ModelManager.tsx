@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { modelManager, ModelInfo, DownloadProgress } from '@/services/ModelManager';
-import { Button, Card, Progress, Tooltip } from '@/components/ui';
-import { formatBytes } from '@/lib/utils';
-import { Download, Trash2, X, Check, AlertCircle, RotateCcw } from 'lucide-react';
+import { formatBytes } from '@/utils/formatters';
+import { Download, Trash2, Check, AlertCircle, RotateCcw } from 'lucide-react';
 
 export function ModelManager() {
   const [models, setModels] = useState<ModelInfo[]>([]);
@@ -70,7 +69,7 @@ export function ModelManager() {
   if (!isInitialized) {
     return (
       <div className="p-6 flex items-center justify-center">
-        <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+        <div className="animate-spin h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full"></div>
         <span className="ml-3">Initializing model manager...</span>
       </div>
     );
@@ -80,14 +79,17 @@ export function ModelManager() {
     <div className="w-full space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Local AI Models</h2>
-        <Button onClick={handleRefresh} variant="outline" size="sm">
+        <button 
+          onClick={handleRefresh} 
+          className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
           <RotateCcw className="mr-2 h-4 w-4" />
           Refresh
-        </Button>
+        </button>
       </div>
       
       {error && (
-        <div className="bg-destructive/15 text-destructive p-3 rounded-md flex items-start">
+        <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 p-3 rounded-md flex items-start">
           <AlertCircle className="h-5 w-5 mr-2 shrink-0 mt-0.5" />
           <p>{error}</p>
         </div>
@@ -95,12 +97,12 @@ export function ModelManager() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {models.map(model => (
-          <Card key={model.id} className="overflow-hidden">
+          <div key={model.id} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
             <div className="p-4">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-medium text-lg">{model.name}</h3>
-                  <p className="text-muted-foreground text-sm">{model.provider}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">{model.provider}</p>
                 </div>
                 {model.downloaded && (
                   <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs px-2 py-1 rounded-full flex items-center">
@@ -112,23 +114,23 @@ export function ModelManager() {
               
               <div className="mt-2 space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Size:</span>
+                  <span className="text-gray-500 dark:text-gray-400">Size:</span>
                   <span>{formatBytes(model.size)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Parameters:</span>
+                  <span className="text-gray-500 dark:text-gray-400">Parameters:</span>
                   <span>{(model.parameters / 1000000000).toFixed(1)}B</span>
                 </div>
                 {model.quantization && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Quantization:</span>
+                    <span className="text-gray-500 dark:text-gray-400">Quantization:</span>
                     <span>{model.quantization}</span>
                   </div>
                 )}
               </div>
               
               {model.description && (
-                <p className="mt-3 text-sm text-muted-foreground">{model.description}</p>
+                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">{model.description}</p>
               )}
               
               {downloadProgress.has(model.id) && (
@@ -137,9 +139,14 @@ export function ModelManager() {
                     <span>{downloadProgress.get(model.id)!.status}</span>
                     <span>{downloadProgress.get(model.id)!.percentage}%</span>
                   </div>
-                  <Progress value={downloadProgress.get(model.id)!.percentage} />
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div 
+                      className="bg-primary-500 dark:bg-primary-400 h-2.5 rounded-full"
+                      style={{ width: `${downloadProgress.get(model.id)!.percentage}%` }}
+                    ></div>
+                  </div>
                   {downloadProgress.get(model.id)!.status === 'downloading' && (
-                    <div className="text-xs text-center mt-1 text-muted-foreground">
+                    <div className="text-xs text-center mt-1 text-gray-500 dark:text-gray-400">
                       {formatBytes(downloadProgress.get(model.id)!.bytesDownloaded)} / {formatBytes(downloadProgress.get(model.id)!.totalBytes)}
                     </div>
                   )}
@@ -147,33 +154,32 @@ export function ModelManager() {
               )}
             </div>
             
-            <div className="p-4 bg-muted/40 flex justify-end space-x-2">
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 flex justify-end space-x-2">
               {!model.downloaded ? (
-                <Button 
+                <button 
                   onClick={() => handleDownload(model.id)} 
                   disabled={downloadProgress.has(model.id)}
-                  size="sm"
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download
-                </Button>
+                </button>
               ) : (
-                <Button 
+                <button 
                   onClick={() => handleDelete(model.id)} 
-                  variant="destructive"
-                  size="sm"
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
-                </Button>
+                </button>
               )}
             </div>
-          </Card>
+          </div>
         ))}
         
         {models.length === 0 && (
-          <div className="col-span-full p-8 text-center bg-muted/30 rounded-lg">
-            <p className="text-muted-foreground">No models available. Try refreshing the list.</p>
+          <div className="col-span-full p-8 text-center bg-gray-100 dark:bg-gray-800/30 rounded-lg">
+            <p className="text-gray-500 dark:text-gray-400">No models available. Try refreshing the list.</p>
           </div>
         )}
       </div>

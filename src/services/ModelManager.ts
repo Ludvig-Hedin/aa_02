@@ -344,7 +344,7 @@ export class ModelManager {
    * Create a ModelService for a local model
    */
   createModelService(modelId: string): ModelService {
-    const model = this.availableModels.get(modelId);
+    const model = this.getModel(modelId);
     
     if (!model) {
       throw new Error(`Model ${modelId} not found`);
@@ -354,7 +354,11 @@ export class ModelManager {
       throw new Error(`Model ${modelId} is not downloaded`);
     }
     
-    return createLocalModelService(model.id, model.name, model.path);
+    return createLocalModelService({
+      id: model.id,
+      name: model.name,
+      modelPath: model.path
+    });
   }
   
   /**

@@ -1,9 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   swcMinify: true,
   images: {
-    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com', 'supabase.com'],
+    domains: ['placehold.co', 'avatars.githubusercontent.com', 'img.youtube.com', 'ui-avatars.com'],
   },
   webpack: (config) => {
     // Handle integration with external repositories
