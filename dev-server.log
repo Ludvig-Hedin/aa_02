@@ -1,0 +1,46 @@
+
+> aa_02@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.24
+  - Local:        http://localhost:3002
+  - Environments: .env.local
+
+ ✓ Starting...
+TypeError [ERR_INVALID_ARG_TYPE]: The "to" argument must be of type string. Received undefined
+    at Object.relative (node:path:1287:5)
+    at Watchpack.<anonymous> (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js:381:55)
+    at Watchpack.emit (node:events:518:28)
+    at Watchpack._onTimeout (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/compiled/watchpack/watchpack.js:1:37727)
+    at listOnTimeout (node:internal/timers:594:17)
+    at process.processTimers (node:internal/timers:529:7) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+TypeError [ERR_INVALID_ARG_TYPE]: The "to" argument must be of type string. Received undefined
+    at Object.relative (node:path:1287:5)
+    at Watchpack.<anonymous> (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js:381:55)
+    at Watchpack.emit (node:events:518:28)
+    at Watchpack._onTimeout (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/compiled/watchpack/watchpack.js:1:37727)
+    at listOnTimeout (node:internal/timers:594:17)
+    at process.processTimers (node:internal/timers:529:7) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+TypeError [ERR_INVALID_ARG_TYPE]: The "to" argument must be of type string. Received undefined
+    at Object.relative (node:path:1287:5)
+    at Watchpack.<anonymous> (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js:381:55)
+    at Watchpack.emit (node:events:518:28)
+    at Watchpack._onTimeout (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/compiled/watchpack/watchpack.js:1:37727)
+    at listOnTimeout (node:internal/timers:594:17)
+    at process.processTimers (node:internal/timers:529:7) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+TypeError [ERR_INVALID_ARG_TYPE]: The "to" argument must be of type string. Received undefined
+    at Object.relative (node:path:1287:5)
+    at Watchpack.<anonymous> (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js:381:55)
+    at Watchpack.emit (node:events:518:28)
+    at Watchpack._onTimeout (/Users/ludvighedin/Programming/aa_02/node_modules/next/dist/compiled/watchpack/watchpack.js:1:37727)
+    at listOnTimeout (node:internal/timers:594:17)
+    at process.processTimers (node:internal/timers:529:7) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+[?25h

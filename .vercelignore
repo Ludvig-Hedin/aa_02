@@ -1,0 +1,27 @@
+# Node modules
+node_modules
+
+# Development files
+.cursor
+.git
+.gitignore
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vscode
+.idea
+
+# Build directories
+.next
+out
+
+# Repositories folder with cloned repos
+repositories/
+
+# Script files
+clone_repos.sh
+
+# Large documentation files
+*.md
+!README.md 
