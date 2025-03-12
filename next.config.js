@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
@@ -27,9 +27,20 @@ const nextConfig = {
       fs: false,
       path: false,
       os: false,
+      child_process: false,
+      net: false,
+      tls: false,
+      'fs-extra': false,
     };
     
     return config;
+  },
+  // Prevent issues with the dev server's file watcher
+  onDemandEntries: {
+    // period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 60 * 60 * 1000,
+    // number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 5,
   },
 }
 

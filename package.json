@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3002",
     "build": "next build",
+    "vercel-build": "NODE_OPTIONS=--max-old-space-size=4096 next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -19,7 +20,7 @@
     "clsx": "^2.1.1",
     "langchain": "^0.0.179",
     "lucide-react": "^0.479.0",
-    "next": "^14.0.0",
+    "next": "^13.5.6",
     "next-themes": "^0.2.1",
     "openai": "^4.17.0",
     "react": "^18.2.0",

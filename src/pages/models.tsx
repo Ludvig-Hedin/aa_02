@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '@supabase/auth-helpers-react';
+import Head from 'next/head';
 import DashboardLayout from '@/components/DashboardLayout';
 import { getLocalModels } from '@/services/models/ModelService';
 import { LocalModelService } from '@/services/models/LocalModelService';
-import { formatBytes } from '@/utils/formatters';
+import { formatBytes } from '@/lib/utils';
 
 export default function ModelsPage() {
   const router = useRouter();
@@ -78,6 +79,10 @@ export default function ModelsPage() {
 
   return (
     <DashboardLayout title="Model Management" description="Manage your AI models">
+      <Head>
+        <title>Model Management | Personal AI Assistant</title>
+      </Head>
+      
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Local Models</h2>
         <p className="mb-6 text-gray-600 dark:text-gray-400">
@@ -125,7 +130,7 @@ export default function ModelsPage() {
                   <div className="mt-2">
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                       <div
-                        className="bg-gray-600 dark:bg-gray-300 h-2.5 rounded-full"
+                        className="bg-primary-500 dark:bg-primary-400 h-2.5 rounded-full"
                         style={{ width: `${model.downloadProgress}%` }}
                       ></div>
                     </div>
@@ -153,7 +158,7 @@ export default function ModelsPage() {
                   ) : (
                     <button
                       onClick={() => handleDownload(model)}
-                      className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm rounded-md"
+                      className="px-3 py-1 bg-primary-100 hover:bg-primary-200 dark:bg-primary-900 dark:hover:bg-primary-800 text-primary-900 dark:text-primary-100 text-sm rounded-md"
                     >
                       Download
                     </button>

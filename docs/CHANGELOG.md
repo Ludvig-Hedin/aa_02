@@ -28,11 +28,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated navigation sidebar to include Models page with appropriate icons
 - Modified DashboardLayout component to use correct navigation structure
 - Implemented monochromatic color scheme in Tailwind configuration
+- Moved Models page from app directory to pages directory
+- Fixed ModelManager.ts to use correct function signature
+- Updated Next.js configuration to handle build errors
 
 ### Fixed
 - Corrected import paths for utility functions
 - Fixed model selection in chat interface
 - Resolved navigation highlighting for current page
+- Fixed ModelManager.createModelService function to use correct parameter structure
+- Resolved conflicts between app and pages directories
 
 ## [0.1.0] - 2025-03-11
 

@@ -8,19 +8,5 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Format bytes to a human-readable string
- * @param bytes The number of bytes
- * @param decimals The number of decimal places to round to
- * @returns A human-readable string (e.g. "1.5 MB")
- */
-export function formatBytes(bytes: number, decimals: number = 2): string {
-  if (bytes === 0) return '0 Bytes';
-
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i];
-} 
+// Export format functions from utils/formatters directly 
+export * from "../utils/formatters"; 
